@@ -1,20 +1,24 @@
 package academy.devdojo.sprinboot2essentialsexercicio.controller;
 
 import academy.devdojo.sprinboot2essentialsexercicio.domain.Anime;
-import academy.devdojo.sprinboot2essentialsexercicio.requests.AnimePostRequestBody;
-import academy.devdojo.sprinboot2essentialsexercicio.requests.AnimePutRequestBody;
+import academy.devdojo.sprinboot2essentialsexercicio.repository.AnimeRepository;
+import academy.devdojo.sprinboot2essentialsexercicio.requests.*;
 import academy.devdojo.sprinboot2essentialsexercicio.service.AnimeService;
-import academy.devdojo.sprinboot2essentialsexercicio.util.DateUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,19 +26,37 @@ import java.util.List;
 @Log4j2
 @RequiredArgsConstructor
 public class AnimeController {
-    private final DateUtil dateUtil;
     private final AnimeService animeService;
+    private final AnimeRepository animeRepository;
+
 
     @GetMapping
-    public ResponseEntity<Page<Anime>> list(Pageable pageable) {
-        log.info(dateUtil.formatLocalDateTimeTODatabaseStyle(LocalDateTime.now()));
+    @Operation(summary = "List all animes paginated", description = "The default size is 20, use the parameter size to change the default value",
+            tags = {"anime"})
+    public ResponseEntity<Page<Anime>> list(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(animeService.listAll(pageable));
+    }
+
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<Anime>> listAll() {
+        return ResponseEntity.ok(animeService.listAllNonPageable());
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Anime> findByID(@PathVariable long id) {
-        log.info(dateUtil.formatLocalDateTimeTODatabaseStyle(LocalDateTime.now()));
         return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestException(id));
+    }
+
+    @GetMapping(path = "by-id/{id}")
+    public ResponseEntity<Anime> findByIDAuthenticationPrincipal(@PathVariable long id,
+                                                                 @AuthenticationPrincipal UserDetails userDetails){
+        log.info(userDetails);
+        return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestException(id));
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<List<Anime>> findByName(@RequestParam(required = false) String name){
+        return ResponseEntity.ok(animeService.findByName(name));
     }
 
     @PostMapping
@@ -42,7 +64,11 @@ public class AnimeController {
         return new ResponseEntity<>(animeService.save(animePostRequestBody), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/admin/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
+            @ApiResponse(responseCode = "400", description = "When Anime Does Not Exist in the Database")
+    })
     public ResponseEntity<Void> delete(@PathVariable long id) {
         animeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -53,6 +79,5 @@ public class AnimeController {
         animeService.replace(animePutRequestBody);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 
 }

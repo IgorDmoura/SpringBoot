@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
-@Configuration //Se aplica a todo projeto
+@Configuration //Se aplica a todoo projeto
 public class DevDojoWebMvcConfiguer implements WebMvcConfigurer {
 
     //page= qual pagina aparece primeiro 0 é a primeira // size quantos elementos aparece por pagina

@@ -1,12 +1,13 @@
 package academy.devdojo.sprinboot2essentialsexercicio.repository;
 
 import academy.devdojo.sprinboot2essentialsexercicio.domain.Anime;
+import academy.devdojo.sprinboot2essentialsexercicio.domain.DevDojoUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface AnimeRepository extends JpaRepository<Anime, Long> {
+public interface DevDojoUserRepository extends JpaRepository<DevDojoUser, Long> {
 
-    List<Anime> findByName(String name);
+    DevDojoUser findByUsername(String username);
 
 }

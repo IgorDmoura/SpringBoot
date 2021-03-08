@@ -23,16 +23,19 @@ public class AnimeService {
         return animeRepository.findAll(pageable);
     }
 
+    public List<Anime> listAllNonPageable() {
+        return animeRepository.findAll();
+
+    }
+
     public Anime findByIdOrThrowBadRequestException(long id) {
         return animeRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Anime Not Found"));
     }
 
-    @Transactional //Executa o codigo completo antes de da o commit
-    public Anime save(AnimePostRequestBody animePostRequestBody){
-
+    @Transactional
+    public Anime save(AnimePostRequestBody animePostRequestBody) {
         return animeRepository.save(AnimeMapper.INSTANCE.toAnime(animePostRequestBody));
-
     }
 
     public void delete(long id) {
@@ -45,5 +48,9 @@ public class AnimeService {
         anime.setId(savedAnime.getId());
 
         animeRepository.save(anime);
+    }
+
+    public List<Anime> findByName(String name) {
+        return animeRepository.findByName(name);
     }
 }
