@@ -8,10 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class Sprinboot2EssentialsexercicioApplication {
+public class Springboot2EssentialsexercicioApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Sprinboot2EssentialsexercicioApplication.class, args);
+		SpringApplication.run(Springboot2EssentialsexercicioApplication.class, args);
 	}
 
 	@Bean
